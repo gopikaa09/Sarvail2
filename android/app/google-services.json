@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "269027077328",
+    "project_id": "sarvail-app-5be8b",
+    "storage_bucket": "sarvail-app-5be8b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269027077328:android:3d2b583195278ded7b82d5",
+        "android_client_info": {
+          "package_name": "com.galaxies.firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM0mDIkhycbGzEKoAP9641PLYps2m6aaQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
