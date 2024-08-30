@@ -5,10 +5,10 @@ export default function Badge({ text, onPress, isSelected }) {
   return (
     <TouchableOpacity onPress={onPress}>
       <View
-        className={`border-2 rounded-xl p-2 mr-2 ${isSelected ? ' border-secondary-100 text-slate-100' : 'border-white'
+        className={`rounded-2xl p-1.5 mr-2 ${isSelected ? ' bg-secondary-100 text-slate-100 border-secondary-200' : 'border-white border'
           }`}
       >
-        <Text className={isSelected ? 'text-slate-100' : 'text-slate-50'}>{text}</Text>
+        <Text className={`text-xs ${isSelected ? 'text-slate-200 font-semibold' : 'text-slate-100'}`}>{text}</Text>
       </View>
     </TouchableOpacity>
   );

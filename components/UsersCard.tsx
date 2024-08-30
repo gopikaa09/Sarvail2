@@ -1,9 +1,16 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 
 export default function UsersCard({ user }) {
+  const navigate = useRouter();
+
+  const handlePress = () => {
+    navigate.push(`/userDetails/${user.id}`); // Adjust to your details page route
+  };
   return (
-    <View className="flex-row items-center bg-slate-100 p-4 rounded-2xl my-2 mx-4">
+    <View className="flex-row items-center bg-slate-100 p-4 rounded-2xl my-2 mx-4"
+    >
       {/* Avatar with Initial */}
       {
         user?.ds_profile_pic ? <>
@@ -24,10 +31,11 @@ export default function UsersCard({ user }) {
       }
 
 
-      {/* User Details */}
       <View className="ml-4">
-        <Text className="text-base font-semibold text-slate-900">{user?.user_display_name}</Text>
-        <Text className="text-sm text-slate-600">{user?.user_email}</Text>
+        <Text className="text-base font-semibold text-slate-900"
+          onPress={handlePress}
+        >{user?.user_display_name}</Text>
+        {/* <Text className="text-sm text-slate-600">{user?.user_email}</Text> */}
         <Text className="text-sm text-slate-600">{user?.ds_profession}</Text>
         <Text className="text-sm text-slate-600">{user?.ds_batch}</Text>
       </View>

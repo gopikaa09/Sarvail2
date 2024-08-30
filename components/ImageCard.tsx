@@ -1,19 +1,19 @@
-import { Alert, Image, Share, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Share, Text, TouchableOpacity, View, Linking } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
 import { truncateHtml } from '@/hooks/useTruncate';
 import Icons from 'react-native-vector-icons/AntDesign';
-import Icons2 from 'react-native-vector-icons/Feather';
 
 const ImageCard = ({ item }) => {
   const truncatedContent = truncateHtml(item?.post_content, 150);
   const avatar = item?.post_author === '1'
     ? 'https://media.licdn.com/dms/image/C5603AQGPN1Fj6eXLWQ/profile-displayphoto-shrink_400_400/0/1581546724198?e=2147483647&v=beta&t=ndNnjK31VXbZNDhy-EaxJZd55nt6FTu_ShrEq-Z9_Io'
     : ''; // Set to a proper URL or local path
-  const navigate = useRouter();
+  const router = useRouter();
 
   const handlePress = () => {
-    navigate.push(`/details/${item.ID}`); // Adjust to your details page route
+    // Ensure this route matches your app's route structure
+    router.push(`/details/${item.ID}`);
   };
 
   const handleShare = async () => {
@@ -31,7 +31,7 @@ const ImageCard = ({ item }) => {
         // dismissed
       }
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
@@ -41,6 +41,13 @@ const ImageCard = ({ item }) => {
     month: 'long',
     day: 'numeric',
   });
+
+  // Optional: Add a function to handle opening external links
+  const handleLinkOpen = (url) => {
+    Linking.openURL(url).catch((err) => {
+      console.error('Failed to open URL:', err);
+    });
+  };
 
   return (
     <View className="flex flex-col px-4 mb-8">

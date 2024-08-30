@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Image, Text, View, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import { Image, Text, View, ScrollView, Dimensions, ActivityIndicator, StatusBar, StyleSheet } from 'react-native';
 import RenderHTML from 'react-native-render-html';
+import { LinearGradient } from 'expo-linear-gradient';
+import Badge from '@/components/Badge';
+import { icons } from '@/constants';
+const { width } = Dimensions.get('window');
 
 const Details = () => {
   const { ID } = useLocalSearchParams();
@@ -29,48 +33,67 @@ const Details = () => {
 
     fetchData();
   }, [ID]);
-
+  const formattedDate = new Date(data?.post_date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   return (
-    <SafeAreaView className="flex-1 bg-[#1E293B]">
-      {/* Move alignItems to contentContainerStyle */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, alignItems: 'center' }}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+
         {loading ? (
-          <View className="flex-1 justify-center items-center">
+          <View style={styles.centered}>
             <ActivityIndicator size="large" color="#fff" />
           </View>
         ) : error ? (
-          <View className="flex-1 justify-center items-center">
-            <Text className="text-[#EF4444] text-lg">Error: {error.message}</Text>
+          <View style={styles.centered}>
+            <Text style={styles.errorText}>Error: {error.message}</Text>
           </View>
         ) : (
           data && (
-            <View className="items-center justify-center">
-              {data?.featured_image?.large ? (
-                <Image
-                  source={{ uri: data.featured_image.large }}
-                  style={{ width: Dimensions.get('window').width - 40, height: 240 }} // Replace className with style
-                  className="rounded-lg mt-5"
-                  resizeMode="cover"
-                />
+            <View style={styles.contentContainer} className='bg-primary'>
 
+              {data?.featured_image?.large ? (
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: data.featured_image.large }}
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
+                  <LinearGradient
+                    colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+                    style={styles.gradient}
+                  />
+                  <View style={styles.imageText} className='flex flex-col'>
+
+                    <Text className='bg-secondary-100 text-slate-50 p-2 rounded-3xl font-semibold self-start'>{data?.categories[0]?.name}</Text>
+                    <Text className='text-slate-50 text-2xl font-semibold'>{data?.post_title}</Text>
+                    <Text className='text-slate-100 text-sm'>{formattedDate}</Text>
+
+                  </View>
+                </View>
               ) : (
-                <Text className="text-[#EF4444] text-lg">Image not available</Text>
+                <Text style={styles.errorText}>Image not available</Text>
               )}
-              <Text className="font-bold text-xl text-[#E2E8F0] mt-3 mb-2">{data?.post_title}</Text>
 
               {/* Render HTML content */}
-              {data.post_content && (
-                <RenderHTML
-                  contentWidth={Dimensions.get('window').width - 40}
-                  source={{ html: data.post_content }}
-                  tagsStyles={tagsStyles}
-                />
-              )}
+              <View className='bg-primary' style={styles.description}>
+
+                {data.post_content && (
+                  <RenderHTML
+                    contentWidth={Dimensions.get('window').width}
+                    source={{ html: data.post_content }}
+                    tagsStyles={tagsStyles}
+                  />
+                )}
+              </View>
             </View>
           )
         )}
       </ScrollView>
-    </SafeAreaView>
+      <StatusBar barStyle="dark-content" />
+    </View>
   );
 };
 
@@ -97,6 +120,66 @@ const tagsStyles = {
     width: 250,
     height: 250,
   },
+  a: {
+    color: 'white',
+  }
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#1E293B',
+  },
+  scrollViewContent: {
+    paddingHorizontal: 0,
+    alignItems: 'center',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  contentContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageContainer: {
+    width: width,
+    height: 400,
+    // borderRadius: 0,
+    overflow: 'hidden',
+    justifyContent: 'center', // Center content vertically
+    alignItems: 'center', // Center content horizontally
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  gradient: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  imageText: {
+    position: 'absolute',
+    bottom: 60,
+    left: 10,
+
+  },
+  description: {
+    borderTopRightRadius: 40,
+    borderTopLeftRadius: 40,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    position: 'relative',
+    top: -30
+  }
+});
 
 export default Details;

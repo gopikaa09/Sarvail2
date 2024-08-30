@@ -96,7 +96,7 @@ const Profile = () => {
       });
 
       if (response.status === 200) {
-        Alert.alert("Success", "Profile picture updated successfully");
+        Alert.alert("Success", "Please select Image ");
         setProfileImage(response.data.ds_profile_pic); // Update local profile image state
       } else {
         Alert.alert("Error", "Failed to update profile picture");
@@ -147,7 +147,9 @@ const Profile = () => {
     <SafeAreaView className='bg-primary flex-1'>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, alignItems: 'center' }}>
         <View>
-          <TouchableOpacity onPress={openPicker}>
+          <TouchableOpacity
+            onPress={openPicker}
+          >
             <Image
               source={{ uri: profileImage || defaultImage }}
               style={{ width: 80, height: 80 }}

@@ -92,10 +92,6 @@ const SignIn = () => {
             isLoading={isSubmitting}
             containerStyles="mt-7"
           />
-          <View className='justify-center pt-5 flex-row gap-1'>
-            <Text className='text-lg text-gray-100 font-pregular'>Don't have an account?</Text>
-            <Link href="/sign-up" className='text-lg text-secondary font-pregular'>Sign Up</Link>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
