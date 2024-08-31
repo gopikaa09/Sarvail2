@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image, Text, View, ScrollView, Dimensions, ActivityIndicator, StatusBar, StyleSheet } from 'react-native';
 import RenderHTML from 'react-native-render-html';
@@ -7,12 +7,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Badge from '@/components/Badge';
 import { icons } from '@/constants';
 const { width } = Dimensions.get('window');
+import Icons from 'react-native-vector-icons/Entypo';
 
 const Details = () => {
   const { ID } = useLocalSearchParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +40,10 @@ const Details = () => {
     month: 'long',
     day: 'numeric',
   });
+
+  const handleBackStep = () => {
+    router.push('home')
+  }
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -53,7 +59,6 @@ const Details = () => {
         ) : (
           data && (
             <View style={styles.contentContainer} className='bg-primary'>
-
               {data?.featured_image?.large ? (
                 <View style={styles.imageContainer}>
                   <Image
@@ -66,11 +71,12 @@ const Details = () => {
                     style={styles.gradient}
                   />
                   <View style={styles.imageText} className='flex flex-col'>
-
+                    <View className='self-start bg-gray-600 opacity-60 p-2 rounded-3xl relative bottom-40' >
+                      <Icons name="chevron-left" className="bg-slate-600 p-3 self-start" size={20} color="white" onPress={handleBackStep} />
+                    </View>
                     <Text className='bg-secondary-100 text-slate-50 p-2 rounded-3xl font-semibold self-start'>{data?.categories[0]?.name}</Text>
-                    <Text className='text-slate-50 text-2xl font-semibold'>{data?.post_title}</Text>
-                    <Text className='text-slate-100 text-sm'>{formattedDate}</Text>
-
+                    <Text className='text-slate-50 text-2xl font-semibold leading-6 mt-1'>{data?.post_title}</Text>
+                    <Text className='text-slate-100 text-sm mt-2'>{formattedDate}</Text>
                   </View>
                 </View>
               ) : (
@@ -170,7 +176,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 60,
     left: 10,
-
   },
   description: {
     borderTopRightRadius: 40,

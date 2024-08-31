@@ -3,13 +3,21 @@ import { View, Text, ActivityIndicator, StyleSheet, Image, Dimensions, StatusBar
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import SimpleStore from 'react-native-simple-store';
-const { width } = Dimensions.get('window')
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+
+const { width } = Dimensions.get('window');
+
 export default function PeopleDetails() {
   const { userId } = useLocalSearchParams();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [token, setToken] = useState('');
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'personal', title: 'Personal Details' },
+    { key: 'professional', title: 'Professional Details' },
+  ]);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -34,7 +42,7 @@ export default function PeopleDetails() {
         const response = await fetch(`http://sarvail.net/wp-json/ds-custom_endpoints/v1/users?id=${userId}`, {
           method: 'GET',
           headers: {
-            'Api-Token': `Bearer ${token}` // Use the fetched token here
+            'Api-Token': `Bearer ${token}`
           },
         });
 
@@ -55,7 +63,7 @@ export default function PeopleDetails() {
     if (userId) {
       fetchUserData();
     }
-  }, [userId, token]); // Depend on `token` to ensure it's available before fetching data
+  }, [userId, token]);
 
   if (loading) {
     return (
@@ -73,67 +81,85 @@ export default function PeopleDetails() {
     );
   }
 
-  console.log('====================================');
-  console.log(userData);
-  console.log('====================================');
-  return (
-    <View style={styles.container}>
-      <View>
-        {userData ? (
-          <>
-            <View className=" items-center"
-            >
-              {/* Avatar with Initial */}
-              {
-                userData?.user?.ds_profile_pic ? <>
-                  <View className={`bg-slate-100 h-32 w-96 absolute`}>
-
-                  </View>
-                  <Image
-                    source={{ uri: userData?.user?.ds_profile_pic }}
-                    style={{ width: 100, height: 100 }}
-                    className="rounded-full mt-5 relative top-16"
-                    resizeMode="cover"
-                  />
-                </> :
-                  <>
-                    <View className="w-28 h-28 rounded-full bg-slate-200 justify-center items-center relative top-16">
-                      <Text className="text-lg font-bold text-black">
-                        {userData?.user?.user_display_name?.[0]?.toUpperCase()} {/* Display the first letter of the user's name */}
-                      </Text>
-                    </View>
-                  </>
-              }
-
-
-              <View className="ml-4 items-center relative top-16">
-                <Text className="text-lg font-semibold text-slate-100 mt-4"
-                >{userData?.user?.user_display_name}</Text>
-                {/* <Text className="text-sm text-slate-600">{user?.user_email}</Text> */}
-                <Text className="text-sm text-slate-100 my-1">{userData?.user?.ds_batch}</Text>
-              </View>
-
-            </View>
-            <View className='flex gap-y-2 ml-2 relative top-20'>
-              <Text className='text-slate-50 text-xl'>Personal Details</Text>
-              <View className='flex gap-2.5'>
-                <Text className='text-slate-50'>First Name : {userData?.user?.user_nicename}</Text>
-                <Text className='text-slate-50'>Batch : {userData?.user?.ds_batch}</Text>
-                <Text className='text-slate-50'>Email : {userData?.user?.user_email}</Text>
-                <Text className='text-slate-50'>Mobile : {userData?.user_meta?.ds_res_mobile} || {userData?.user_meta?.ds_off_mobile}</Text>
-                <Text className='text-slate-50'>Profession : {userData?.user?.ds_profession}</Text>
-                <Text className='text-slate-50 leading-6'>Address : {userData?.user_meta?.ds_res_address},{userData?.user_meta?.ds_res_city},{userData?.user_meta?.ds_res_state},{userData?.user_meta?.ds_res_pin}</Text>
-              </View>
-            </View>
-            {/* Add more fields as needed */}
-          </>
-        ) : (
-          <Text style={styles.text}>No user data available</Text>
-        )}
-      </View>
-      <StatusBar barStyle="dark-content" />
-
+  const PersonalDetails = () => (
+    <View style={styles.tabContainer}>
+      <Text style={styles.tabText}>First Name: {userData?.user_meta?.first_name}</Text>
+      <Text style={styles.tabText}>Last Name: {userData?.user_meta?.last_name}</Text>
+      <Text style={styles.tabText}>Batch: {userData?.user?.ds_batch}</Text>
+      <Text style={styles.tabText}>Email: {userData?.user?.user_email}</Text>
+      <Text style={styles.tabText}>Mobile:{userData?.user_meta?.ds_res_mobile}</Text>
+      <Text style={styles.tabText}>Blood Group: {userData?.user_meta?.ds_blood_group}</Text>
+      <Text style={styles.tabText}>Gender: {userData?.user_meta?.ds_gender}</Text>
+      <Text style={styles.tabText}>Lives In: {userData?.user_meta?.ds_lives_in}</Text>
+      {userData?.user_meta?.ds_res_address && (
+        <Text style={[styles.tabText, styles.addressText]}>
+          Address: {userData?.user_meta?.ds_res_address}, {userData?.user_meta?.ds_res_city}, {userData?.user_meta?.ds_res_state}, {userData?.user_meta?.ds_res_pin}
+        </Text>
+      )}
     </View>
+  );
+
+  const ProfessionalDetails = () => (
+    <View style={styles.tabContainer}>
+      <Text style={styles.tabText}>First Name: {userData?.user_meta?.first_name}</Text>
+      <Text style={styles.tabText}>Last Name: {userData?.user_meta?.last_name}</Text>
+      <Text style={styles.tabText}>Batch: {userData?.user?.ds_batch}</Text>
+      <Text style={styles.tabText}>Profession: {userData?.user?.ds_profession}</Text>
+      <Text style={styles.tabText}>Email: {userData?.user?.user_email}</Text>
+      <Text style={styles.tabText}>Mobile: {userData?.user_meta?.ds_off_mobile}</Text>
+      {userData?.user_meta?.ds_res_address && (
+        <Text style={[styles.tabText, styles.addressText]}>
+          Address: {userData?.user_meta?.ds_res_address}, {userData?.user_meta?.ds_res_city}, {userData?.user_meta?.ds_res_state}, {userData?.user_meta?.ds_res_pin}
+        </Text>
+      )}
+    </View>
+  );
+
+  const renderScene = SceneMap({
+    personal: PersonalDetails,
+    professional: ProfessionalDetails,
+  });
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {userData && (
+        <View style={styles.headerContainer}>
+          {userData?.user?.ds_profile_pic ? (
+            <>
+              <View style={styles.backgroundImageContainer} />
+              <Image
+                source={{ uri: userData?.user?.ds_profile_pic }}
+                style={styles.profileImage}
+                resizeMode="cover"
+              />
+            </>
+          ) : (
+            <View style={styles.avatarContainer}>
+              <Text style={styles.avatarText}>
+                {userData?.user?.user_display_name?.[0]?.toUpperCase()}
+              </Text>
+            </View>
+          )}
+          <Text style={styles.userNameText}>
+            {userData?.user_meta?.first_name} {userData?.user_meta?.last_name}
+          </Text>
+        </View>
+      )}
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width }}
+        renderTabBar={props => (
+          <TabBar
+            {...props}
+            style={styles.tabBar}
+            indicatorStyle={styles.tabBarIndicator}
+          />
+        )}
+      />
+      <StatusBar barStyle="light-content" />
+    </SafeAreaView>
   );
 }
 
@@ -142,10 +168,59 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1E293B',
   },
-  text: {
+  headerContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  backgroundImageContainer: {
+    backgroundColor: '#E5E7EB',
+    height: 128,
+    width: '100%',
+    position: 'absolute',
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginTop: 60,
+    position: 'relative',
+    top: 16,
+  },
+  avatarContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  avatarText: {
+    fontSize: 28,
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  userNameText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    marginVertical: 8,
+    marginTop: 24,
+    fontSize: 20,
+  },
+  tabContainer: {
+    padding: 16,
+  },
+  tabText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginVertical: 4,
+  },
+  addressText: {
+    lineHeight: 22,
+  },
+  tabBar: {
+    backgroundColor: '#1E293B',
+  },
+  tabBarIndicator: {
+    backgroundColor: '#FF9C01',
   },
   errorText: {
     color: '#EF4444',
