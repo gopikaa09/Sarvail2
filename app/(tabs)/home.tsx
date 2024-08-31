@@ -183,35 +183,35 @@ const Home = () => {
 export default Home;
 const styles = StyleSheet.create({
   itemContainer: {
-    width: width, // Ensure the container matches the full screen width for proper centering
+    width: width,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 0, // Add horizontal margin to create space between items
+    marginHorizontal: 0,
   },
   image: {
-    width: width * 0.9, // Adjust image width dynamically based on screen width
-    height: 280, // Fixed height
+    width: width * 0.9,
+    height: 280,
     borderRadius: 10,
   },
   background: {
     position: 'absolute',
-    width: width * 0.9, // Match image width for background gradient
-    height: 280, // Same height as image
+    width: width * 0.9,
+    height: 280,
     borderRadius: 10,
-    bottom: 0, // Position at the bottom
+    bottom: 0,
   },
   textContainer: {
     position: 'absolute',
-    bottom: 20, // Position text a little above the bottom for better appearance
-    left: 30, // Give some padding from the left
-    right: 30, // Give some padding from the right
+    bottom: 20,
+    left: 30,
+    right: 30,
     lineHeight: 32
   },
   text: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)', // Optional: Add a subtle shadow for better text visibility
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 5,
   },

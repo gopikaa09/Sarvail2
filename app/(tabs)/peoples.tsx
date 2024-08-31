@@ -12,7 +12,7 @@ export default function Peoples() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
-  const [query, setQuery] = useState(''); // Add state for search query
+  const [query, setQuery] = useState('');
 
   const getUser = async () => {
     try {
@@ -34,18 +34,18 @@ export default function Peoples() {
   }, [user]);
 
   const fetchData = async () => {
-    setLoading(true); // Set loading state before fetching new data
+    setLoading(true);
     try {
       const response = await axios.get(
         'http://sarvail.net/wp-json/ds-custom_endpoints/v1/users',
         {
           headers: {
-            "Api-Token": `Bearer ${user.token}` // Replace with your actual token or other headers
+            "Api-Token": `Bearer ${user.token}`
           }
         }
       );
 
-      if (response.status === 200) { // Axios uses response status for checking successful responses
+      if (response.status === 200) {
         const json = response.data;
         setData(json);
         setFilteredData(json);
@@ -56,24 +56,24 @@ export default function Peoples() {
       setError(error);
       Alert.alert("Error", "Failed to fetch data");
     } finally {
-      setLoading(false); // Reset loading state after fetching
+      setLoading(false);
     }
   };
 
   // Search handler
   const handleSearch = () => {
     if (query.trim() === '') {
-      setFilteredData(data); // If query is empty, show all data
+      setFilteredData(data);
     } else {
       const filtered = data.filter((user) =>
-        user?.user_nicename?.toLowerCase().includes(query.toLowerCase()) // Filter users by name
+        user?.user_nicename?.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredData(filtered);
     }
   };
 
   useEffect(() => {
-    handleSearch(); // Call handleSearch whenever query changes
+    handleSearch();
   }, [query]);
 
   if (loading) {
@@ -115,8 +115,8 @@ export default function Peoples() {
   return (
     <SafeAreaView className='bg-primary flex-1'>
       <FlatList
-        data={filteredData} // Use filteredData here
-        keyExtractor={(item) => item?.id?.toString()} // Convert ID to string
+        data={filteredData}
+        keyExtractor={(item) => item?.id?.toString()}
         renderItem={({ item }) => <UsersCard user={item} />}
         ListHeaderComponent={SearchInputComponent()}
       />

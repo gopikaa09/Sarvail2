@@ -108,19 +108,19 @@ const tagsStyles = {
     marginVertical: 8,
     fontSize: 16,
     lineHeight: 24,
-    color: '#E2E8F0', // Slate-100 color
+    color: '#E2E8F0'
   },
   ul: {
     marginVertical: 1,
     paddingLeft: 20,
-    color: '#E2E8F0', // Slate-100 color
+    color: '#E2E8F0',
   },
   li: {
     marginTop: -3,
     fontSize: 16,
     marginLeft: 2,
     lineHeight: 32,
-    color: '#E2E8F0', // Slate-100 color
+    color: '#E2E8F0',
   },
   img: {
     width: 250,
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
     height: 400,
     // borderRadius: 0,
     overflow: 'hidden',
-    justifyContent: 'center', // Center content vertically
-    alignItems: 'center', // Center content horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: '100%',
