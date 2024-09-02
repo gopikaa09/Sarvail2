@@ -6,6 +6,9 @@ import CustomButton from '@/components/CustomButton'
 import { Link, router } from 'expo-router'
 import FormField from '@/components/FormField'
 import CustomMobileField from '@/components/CustomMobileField'
+import axios from 'axios'
+import SimpleStore from 'react-native-simple-store';
+
 const SignUp = () => {
   const [form, setForm] = useState({
     username: '',
@@ -22,23 +25,43 @@ const SignUp = () => {
   const [isSubmitting, setisSubmitting] = useState(false)
 
   const submit = async () => {
-    if (form.username === "" || form.email === "" || form.password === "") {
-      Alert.alert("Error", "Please fill in all fields");
-    }
-
+    // if (form.email === "" || form.password === "") {
+    //   Alert.alert("Error", "Please fill in all fields");
+    //   return;
+    // }
+    console.log(form);
     setisSubmitting(true);
-    try {
-      // const result = await createUser(form.email, form.password, form.username);
-      // setUser(result);
-      // setIsLogged(true);
 
-      router.replace("/home");
+    try {
+      const response = await axios.post(
+        `https://sarvail.net/wp-json/ds-custom_endpoints/v1/register`,
+        {
+          username: form.username,
+          first_name: form.first_name,
+          last_name: form.last_name,
+          ds_batch: form.ds_batch,
+          email: form.email,
+          ds_res_mobile: form.ds_res_mobile,
+          country_code: form.country_code,
+          password: form.password,
+          ds_profession: form.ds_profession
+        },
+      );
+      console.log(response);
+      if (response.status !== 200) {
+        throw new Error('Invalid username or password');
+      }
+      if (response.status === 200) {
+        Alert.alert("Success", "User registered successfully");
+        router.replace("/confirmOTP");
+      }
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
       setisSubmitting(false);
     }
   };
+
   return (
     <SafeAreaView className='bg-primary h-full' >
       <ScrollView>
@@ -47,6 +70,9 @@ const SignUp = () => {
             resizeMode='contain'
             className='w-[115px] h-[115px] mb-5'
           /> */}
+          <View className='flex flex-row items-end'>
+            <Text className='text-secondary-100 text-4xl'>S</Text><Text className="font-semibold text-3xl text-gray-100">arvail</Text>
+          </View>
           <Text className='text-white text-2xl'>Sign up to Sarvail</Text>
           <FormField
             title="Username"
@@ -99,7 +125,7 @@ const SignUp = () => {
             keyboardType='email-address'
             placeholder="Enter Email.."
           />
-          <CustomMobileField
+          {/* <CustomMobileField
             value={`${form.ds_batch},${form.country_code}`}
             handleChangeText={(e) => setForm({
               ...form,
@@ -107,10 +133,20 @@ const SignUp = () => {
             })}
             otherStyles="mt-7"
           // placeholder="Enter Batch.."
+          /> */}
+          <FormField
+            title="Mobile Number"
+            value={form.ds_res_mobile}
+            handleChangeText={(e) => setForm({
+              ...form,
+              ds_res_mobile: e
+            })}
+            otherStyles="mt-7"
+            placeholder="Enter Mobile Number"
           />
           <FormField
             title="Profession"
-            value={form.ds_batch}
+            value={form.ds_profession}
             handleChangeText={(e) => setForm({
               ...form,
               ds_profession: e
