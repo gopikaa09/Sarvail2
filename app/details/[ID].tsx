@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Image, Text, View, ScrollView, Dimensions, ActivityIndicator, StatusBar, StyleSheet } from 'react-native';
+import { Image, Text, View, ScrollView, Dimensions, ActivityIndicator, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
 import RenderHTML from 'react-native-render-html';
 import { LinearGradient } from 'expo-linear-gradient';
 import Badge from '@/components/Badge';
 import { icons } from '@/constants';
 const { width } = Dimensions.get('window');
 import Icons from 'react-native-vector-icons/Entypo';
+import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view';
+
 
 const Details = () => {
   const { ID } = useLocalSearchParams();
@@ -58,6 +60,31 @@ const Details = () => {
           </View>
         ) : (
           data && (
+            // <HeaderImageScrollView
+            //   maxHeight={200}
+            //   minHeight={300}
+            //   headerImage={() => {
+            //     <Image
+            //       source={{ uri: data.featured_image.large }}
+            //       style={styles.image}
+            //       resizeMode="cover"
+            //     />
+            //   }}  // Correct way to use dynamic URL
+            //   renderForeground={() => (
+            //     <View style={{ height: 150, justifyContent: "center", alignItems: "center" }} >
+            //       <TouchableOpacity onPress={() => console.log("tap!!")}>
+            //         <Text style={{ backgroundColor: "transparent" }}>Tap Me!</Text>
+            //       </TouchableOpacity>
+            //     </View>
+            //   )}
+            // >
+            //   <TriggeringView>
+            //     <View>
+
+            //           </View>
+            //   </TriggeringView>
+            // </HeaderImageScrollView>
+
             <View style={styles.contentContainer} className='bg-primary'>
               {data?.featured_image?.large ? (
                 <View style={styles.imageContainer}>
@@ -75,7 +102,7 @@ const Details = () => {
                       <Icons name="chevron-left" className="bg-slate-600 p-3 self-start" size={20} color="white" onPress={handleBackStep} />
                     </View>
                     <Text className='bg-secondary-100 text-slate-50 p-2 rounded-3xl font-semibold self-start'>{data?.categories[0]?.name}</Text>
-                    <Text className='text-slate-50 text-2xl font-semibold leading-6 mt-1'>{data?.post_title}</Text>
+                    <Text className='text-slate-50 text-2xl font-semibold leading-6 mt-1' numberOfLines={2}>{data?.post_title}</Text>
                     <Text className='text-slate-100 text-sm mt-2'>{formattedDate}</Text>
                   </View>
                 </View>
@@ -99,7 +126,7 @@ const Details = () => {
         )}
       </ScrollView>
       <StatusBar barStyle="dark-content" />
-    </View>
+    </View >
   );
 };
 

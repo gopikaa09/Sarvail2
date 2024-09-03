@@ -5,7 +5,8 @@ import { useRouter } from 'expo-router';
 import CustomButton from '@/components/CustomButton';
 import { images } from '@/constants';
 import SimpleStore from 'react-native-simple-store';
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const queryClient = new QueryClient();
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function App() {
   };
 
   return (
+    // <QueryClientProvider client={queryClient}>
     <SafeAreaView className='bg-primary'>
       <View className='items-center justify-center h-full'>
         <Image source={images.sarvailLogo} className='w-44 h-56' />
@@ -42,5 +44,6 @@ export default function App() {
         />
       </View>
     </SafeAreaView>
+    // </QueryClientProvider>
   );
 }

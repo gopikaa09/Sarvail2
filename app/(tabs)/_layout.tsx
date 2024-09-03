@@ -46,7 +46,7 @@ const TabLayout = () => {
             />
           )
         }} />
-        {/* <Tabs.Screen name='search' options={{
+        <Tabs.Screen name='search' options={{
           title: "Search",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
@@ -57,7 +57,7 @@ const TabLayout = () => {
               focused={focused}
             />
           )
-        }} /> */}
+        }} />
         <Tabs.Screen name='peoples' options={{
           title: "Peoples",
           headerShown: false,

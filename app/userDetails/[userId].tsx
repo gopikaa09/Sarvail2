@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Image, Dimensions, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import SimpleStore from 'react-native-simple-store';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import Icons from 'react-native-vector-icons/Entypo'
+import { icons } from '@/constants';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +16,7 @@ export default function PeopleDetails() {
   const [error, setError] = useState(null);
   const [token, setToken] = useState('');
   const [index, setIndex] = useState(0);
+  const router = useRouter()
   const [routes] = useState([
     { key: 'personal', title: 'Personal Details' },
     { key: 'professional', title: 'Professional Details' },
@@ -120,6 +123,10 @@ export default function PeopleDetails() {
     professional: ProfessionalDetails,
   });
 
+
+  const handleBackStep = () => {
+    router.push('peoples')
+  }
   return (
     <SafeAreaView style={styles.container}>
       {userData && (
@@ -132,13 +139,22 @@ export default function PeopleDetails() {
                 style={styles.profileImage}
                 resizeMode="cover"
               />
+              <View className=' bg-gray-600 opacity-60 p-2 rounded-3xl absolute self-start m-2' >
+                <Icons name="chevron-left" className="bg-slate-600 p-3 self-start" size={20} color="white" onPress={handleBackStep} />
+              </View>
             </>
           ) : (
-            <View style={styles.avatarContainer}>
-              <Text style={styles.avatarText}>
-                {userData?.user?.user_display_name?.[0]?.toUpperCase()}
-              </Text>
-            </View>
+            <>
+              <View style={styles.backgroundImageContainer} />
+              <Image
+                source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg" }}
+                style={styles.profileImage}
+                resizeMode="cover"
+              />
+              <View className=' bg-gray-600 opacity-60 p-2 rounded-3xl absolute self-start m-2' >
+                <Icons name="chevron-left" className="bg-slate-600 p-3 self-start" size={20} color="white" onPress={handleBackStep} />
+              </View>
+            </>
           )}
           <Text style={styles.userNameText}>
             {userData?.user_meta?.first_name} {userData?.user_meta?.last_name}

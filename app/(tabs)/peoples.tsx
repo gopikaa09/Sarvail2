@@ -13,6 +13,7 @@ export default function Peoples() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false); // State for managing refreshing
 
   const getUser = async () => {
     try {
@@ -57,24 +58,15 @@ export default function Peoples() {
       Alert.alert("Error", "Failed to fetch data");
     } finally {
       setLoading(false);
+      setRefreshing(false); // Ensure to stop the refreshing animation after fetching data
     }
   };
 
-  // Search handler
-  const handleSearch = () => {
-    if (query.trim() === '') {
-      setFilteredData(data);
-    } else {
-      const filtered = data.filter((user) =>
-        user?.user_nicename?.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }
+  // Implement handleRefresh function to fetch data on pull-to-refresh
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchData();
   };
-
-  useEffect(() => {
-    handleSearch();
-  }, [query]);
 
   if (loading) {
     return (
@@ -99,18 +91,21 @@ export default function Peoples() {
   const SearchInputComponent = () => (
     <View className='my-6 px-4'>
       <View className='flex flex-row items-end'>
-        <Text className='text-secondary-100 text-4xl'>S</Text><Text className="font-semibold text-3xl text-gray-100">arvail</Text>
+        <Text className='text-secondary-100 text-4xl'>S</Text>
+        <Text className="font-semibold text-3xl text-gray-100">arvail</Text>
       </View>
       <Text className="font-semibold text-gray-100 text-lg mb-3">Peoples</Text>
-      <View>
+      {/* Uncomment and modify as needed */}
+      {/* <View>
         <SearchInput
+          placeholder={"Search..."}
           query={query}
           setQuery={setQuery}
           onSearch={handleSearch}
         />
-      </View>
+      </View> */}
     </View>
-  )
+  );
 
   return (
     <SafeAreaView className='bg-primary flex-1'>
@@ -119,6 +114,8 @@ export default function Peoples() {
         keyExtractor={(item) => item?.id?.toString()}
         renderItem={({ item }) => <UsersCard user={item} />}
         ListHeaderComponent={SearchInputComponent()}
+        refreshing={refreshing} // Use refreshing state
+        onRefresh={handleRefresh}
       />
     </SafeAreaView>
   );

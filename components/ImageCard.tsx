@@ -68,12 +68,14 @@ const ImageCard = ({ item }) => {
           resizeMode="cover"
         />
       </TouchableOpacity>
+      <TouchableOpacity onPress={handlePress}>
+        <View className="ml-0 gap-y-1 mt-2"  >
+          <Text className="font-psemibold text-lg text-white" numberOfLines={2}>
+            {item?.post_title}
+          </Text>
+        </View>
+      </TouchableOpacity>
 
-      <View className="ml-0 gap-y-1 mt-2">
-        <Text className="font-psemibold text-lg text-white" numberOfLines={2}>
-          {item?.post_title}
-        </Text>
-      </View>
       <View className='flex flex-row justify-between my-2'>
         <Text className='text-gray-400 text-sm'>{formattedDate}</Text>
         <Icons name="sharealt" size={15} color="white" onPress={handleShare} />
