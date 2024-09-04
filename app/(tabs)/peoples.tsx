@@ -89,7 +89,7 @@ export default function Peoples() {
   }
 
   const SearchInputComponent = () => (
-    <View className='my-6 px-4'>
+    <View className='mt-6 px-4'>
       <View className='flex flex-row items-end'>
         <Text className='text-secondary-100 text-4xl'>S</Text>
         <Text className="font-semibold text-3xl text-gray-100">arvail</Text>

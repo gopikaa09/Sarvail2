@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, ActivityIndicator, FlatList, Keyboard, ScrollView, Dimensions, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, ActivityIndicator, FlatList, ScrollView, Dimensions, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageCard from '@/components/ImageCard';
 import Badge from '@/components/Badge';
@@ -20,33 +20,35 @@ const Home = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [carouselData, setCarouselData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchVisible, setSearchVisible] = useState(false); // Start with false
+  const [searchVisible, setSearchVisible] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [page, setPage] = useState(1); // Track current page
+  const [hasMore, setHasMore] = useState(true);
 
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
   const prevScrollY = useRef(0);
 
   useEffect(() => {
-    fetchData(selectedFilters);
-  }, [selectedFilters]);
+    fetchData();
+  }, [selectedFilters, page]);
 
-  const fetchData = async (categories) => {
+  const fetchData = async () => {
     setLoading(true);
-    setRefreshing(true);
+    setRefreshing(page === 1);
     try {
-      const categoryQuery = categories.length > 0 ? `&category=${categories.join(',')}` : '';
+      const categoryQuery = selectedFilters.length > 0 ? `&category=${selectedFilters.join(',')}` : '';
       const response = await fetch(
-        `http://sarvail.net/wp-json/ds-custom_endpoints/v1/posts?per_page=200${categoryQuery}`
+        `http://sarvail.net/wp-json/ds-custom_endpoints/v1/posts?per_page=20&page=${page}${categoryQuery}`
       );
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const json = await response.json();
-      const carouselData = json.slice(1, 4);
-      setCarouselData(carouselData);
-      setData(json);
-      setFilteredData(json);
+      setCarouselData(json.slice(0, 3));
+      setData((prevData) => [...prevData, ...json]);
+      setFilteredData((prevData) => [...prevData, ...json]);
+      setHasMore(json.length >= 20); // Check if there are more items
     } catch (error) {
       setError(error);
     } finally {
@@ -81,13 +83,8 @@ const Home = () => {
   ];
 
   const handleFilters = (category) => {
-    setSelectedFilters((prevSelected) => {
-      if (prevSelected.includes(category)) {
-        return prevSelected.filter((item) => item !== category);
-      } else {
-        return [...prevSelected, category];
-      }
-    });
+    setSelectedFilters([category]);
+    setPage(1); // Reset page when filters change
   };
 
   const renderItem = React.useCallback(({ item }) => (
@@ -131,7 +128,7 @@ const Home = () => {
               <Badge
                 key={index}
                 text={filter.label}
-                isSelected={selectedFilters.includes(filter.value)}
+                isSelected={selectedFilters[0] === filter.value}
                 onPress={() => handleFilters(filter.value)}
               />
             ))}
@@ -176,46 +173,27 @@ const Home = () => {
     </View>
   );
 
-  const onRefresh = useCallback(() => {
-    fetchData(selectedFilters);
-  }, [selectedFilters]);
-
-  const debouncedHandleScroll = debounce((event) => {
-    const currentOffset = event.nativeEvent.contentOffset.y;
-
-    if (currentOffset > prevScrollY.current) {
-      if (!searchFocused) {
-        setSearchVisible(false);
-      }
-    } else {
-      setSearchVisible(true);
+  const handleLoadMore = () => {
+    if (hasMore && !loading) {
+      setPage((prevPage) => prevPage + 1); // Load next page
     }
-
-    prevScrollY.current = currentOffset;
-  }, 100);
+  };
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {
       useNativeDriver: false,
       listener: (event) => {
-        // Ensure event and event.nativeEvent are not null
         if (event && event.nativeEvent) {
           const currentOffset = event.nativeEvent.contentOffset.y;
-
-          // Ensure prevScrollY.current is defined
           if (prevScrollY.current !== undefined) {
             if (currentOffset > prevScrollY.current) {
-              // Scrolling down
               if (!searchFocused) {
                 setSearchVisible(false);
               }
             } else {
-              // Scrolling up
               setSearchVisible(true);
             }
-
-            // Update previous scroll position
             prevScrollY.current = currentOffset;
           }
         }
@@ -225,7 +203,7 @@ const Home = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
-      {loading ? (
+      {loading && data.length === 0 ? (
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color="#fff" />
         </View>
@@ -247,8 +225,14 @@ const Home = () => {
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="on-drag"
           refreshing={refreshing}
-          onRefresh={onRefresh}
+          onRefresh={() => {
+            setPage(1); // Reset page when refreshing
+            fetchData();
+          }}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
           onScroll={handleScroll}
+          ListFooterComponent={loading && hasMore ? <ActivityIndicator size="large" color="#fff" /> : null}
         />
       )}
     </SafeAreaView>
@@ -300,4 +284,3 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
-

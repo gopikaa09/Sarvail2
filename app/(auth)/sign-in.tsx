@@ -25,11 +25,14 @@ const SignIn = () => {
   };
 
   const submit = async () => {
-    if (form.email === "" || form.password === "") {
-      Alert.alert("Error", "Please fill in all fields");
+    if (form.email === "" && form.password === "") {
+      Alert.alert("Error", "Please Enter User name and Password");
       return; // Exit early if fields are not filled
     }
-
+    if (form.password === "") {
+      Alert.alert("Error", "Please Enter Password");
+      return; // Exit early if fields are not filled
+    }
     setIsSubmitting(true);
 
     try {
