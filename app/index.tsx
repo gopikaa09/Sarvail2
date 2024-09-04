@@ -28,9 +28,13 @@ export default function App() {
     checkLoginStatus();
   }, [router]);
 
-  const handlePress = () => {
+  const handlePasssword = () => {
     router.push('/sign-in');
   };
+
+  const handleOTP = () => {
+    router.push('/otpLoginConfirm')
+  }
 
   return (
     // <QueryClientProvider client={queryClient}>
@@ -38,9 +42,14 @@ export default function App() {
       <View className='items-center justify-center h-full'>
         <Image source={images.sarvailLogo} className='w-44 h-56' />
         <CustomButton
-          title="Continue With email"
-          handlePress={handlePress}
-          containerStyles="w-[240px] mt-12"
+          title="Login With Password"
+          handlePress={handlePasssword}
+          containerStyles="w-[240px] mt-6"
+        />
+        <CustomButton
+          title="Login with OTP"
+          handlePress={handleOTP}
+          containerStyles="w-[240px] mt-6"
         />
       </View>
     </SafeAreaView>

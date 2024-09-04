@@ -20,7 +20,13 @@ const AuthLayout = () => {
           }}
         />
         <Stack.Screen
-          name='confirmOTP'
+          name='otpLoginConfirm'
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name='otpRegisterConfirm'
           options={{
             headerShown: false
           }}

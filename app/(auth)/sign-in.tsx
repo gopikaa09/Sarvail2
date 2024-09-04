@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
@@ -14,6 +14,15 @@ const SignIn = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const passwordRef = useRef(null);
+
+  const handleEmailSubmit = () => {
+    passwordRef.current.focus(); // Move focus to password field
+  };
+
+  const handlePasswordSubmit = async () => {
+    await submit(); // Submit form when password field is submitted
+  };
 
   const submit = async () => {
     if (form.email === "" || form.password === "") {
@@ -45,7 +54,7 @@ const SignIn = () => {
 
       // Save user data to local storage
       await SimpleStore.save('user', userData);
-      await SimpleStore.save('loggedIn', true)
+      await SimpleStore.save('loggedIn', true);
       console.log(userData);
 
       Alert.alert("Success", "User signed in successfully");
@@ -69,7 +78,7 @@ const SignIn = () => {
             </View>
             <Text className='text-white text-xl'>Log in to Sarvail</Text>
             <FormField
-              title="Email"
+              title="User Name"
               value={form.email}
               handleChangeText={(e) => setForm({
                 ...form,
@@ -77,9 +86,11 @@ const SignIn = () => {
               })}
               otherStyles="mt-7"
               keyboardType='email-address'
-              placeholder="Enter Email.."
+              placeholder="Enter User Name.."
+              onSubmitEditing={handleEmailSubmit} // Move focus to password field
             />
             <FormField
+              ref={passwordRef}
               title="Password"
               value={form.password}
               handleChangeText={(e) => setForm({
@@ -89,6 +100,7 @@ const SignIn = () => {
               otherStyles="mt-7"
               placeholder="Enter Password"
               secureTextEntry={true}
+              onSubmitEditing={handlePasswordSubmit} // Submit form
             />
             <CustomButton
               title="Sign In"

@@ -14,10 +14,10 @@ export default function ConfirmOTP() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter()
   const submit = async () => {
-    if (form.username === "" || form.otp_register === "") {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
+    // if (form.username === "" || form.otp_register === "") {
+    //   Alert.alert("Error", "Please fill in all fields");
+    //   return;
+    // }
     console.log(form);
     setIsSubmitting(true);
 
@@ -36,6 +36,8 @@ export default function ConfirmOTP() {
       }
     } catch (error) {
       Alert.alert("Error", error.message);
+      // router.replace("/sign-in");
+
     } finally {
       setIsSubmitting(false);
     }
@@ -49,7 +51,7 @@ export default function ConfirmOTP() {
           </View>
           <Text className='text-white text-xl'>Confirm OTP</Text>
           <FormField
-            title="Email"
+            title="User Name"
             value={form.username}
             handleChangeText={(e) => setForm({
               ...form,
@@ -59,7 +61,7 @@ export default function ConfirmOTP() {
             placeholder="Enter Username"
           />
           <FormField
-            title="Password"
+            title="OTP"
             value={form.otp_register}
             handleChangeText={(e) => setForm({
               ...form,

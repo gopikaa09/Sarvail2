@@ -12,7 +12,7 @@ import * as ImagePicker from 'expo-image-picker';
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
+  const [refreshing, setRefreshing] = useState(false);
   const [form, setForm] = useState({
     username: '',
     ds_profile_pic: '',
@@ -24,7 +24,6 @@ const Profile = () => {
     country_code: '',
     password: '',
     ds_profession: ''
-
   });
   const [token, setToken] = useState('');
   const [profileImage, setProfileImage] = useState(null);
@@ -38,22 +37,28 @@ const Profile = () => {
     try {
       const storedUser = await SimpleStore.get('user');
       console.log("storedUser", storedUser);
+
       if (storedUser) {
+        const userData = storedUser.user;
+        const userMetaData = storedUser.user_meta;
+
         setUser(storedUser);
+
         setForm({
-          username: storedUser.user.user_nicename || '',
-          first_name: storedUser?.first_name || '',
-          last_name: storedUser?.last_name || '',
-          ds_batch: storedUser.ds_batch || '',
-          user_email: storedUser.user.user_email || '',
-          ds_res_mobile: storedUser.ds_res_mobile || '',
-          country_code: storedUser.country_code || '',
+          username: userData.user_nicename || '',
+          first_name: userMetaData.first_name || '',
+          last_name: userMetaData.last_name || '',
+          ds_batch: userData.ds_batch || '',
+          user_email: userData.user_email || '',
+          ds_res_mobile: userMetaData.ds_res_mobile || '',
+          country_code: userMetaData.country_code || '',
           password: '',
-          ds_profile_pic: storedUser?.ds_profile_pic,
-          ds_profession: storedUser.user_meta.ds_profession || ''
+          ds_profile_pic: userData.ds_profile_pic || '',
+          ds_profession: userMetaData.ds_profession || ''
         });
-        setToken(storedUser.token); // Set token for API requests
-        setProfileImage(storedUser.user.ds_profile_pic || null); // Set profile image
+
+        setToken(storedUser.token || '');
+        setProfileImage(userData.ds_profile_pic || null);
       } else {
         console.warn('No user data found in SimpleStore');
       }
@@ -61,7 +66,7 @@ const Profile = () => {
       console.error('Failed to fetch user data', error);
     } finally {
       setLoading(false);
-      setRefreshing(false); // Stop refreshing after data is fetched
+      setRefreshing(false);
     }
   };
 
@@ -74,10 +79,9 @@ const Profile = () => {
   };
 
   const openPicker = async () => {
-    // Request media library permissions
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       Alert.alert('Permission required', 'Permission to access the photo gallery is required!');
       return;
     }
@@ -87,8 +91,6 @@ const Profile = () => {
       allowsEditing: true,
       quality: 1,
     });
-
-    // console.log('Image Picker Result:', result);
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const uri = result.assets[0].uri;
@@ -100,15 +102,13 @@ const Profile = () => {
 
   const uploadProfilePicture = async (imageUri) => {
     try {
-      // Prepare form data
       const formData = new FormData();
       formData.append('ds_profile_pic', {
         uri: imageUri,
-        type: 'image/jpeg', // or 'image/png'
-        name: 'profile-picture.jpg', // A name for the file
+        type: 'image/jpeg',
+        name: 'profile-picture.jpg',
       });
 
-      // Make the request
       const response = await axios.post(
         'http://sarvail.net/wp-json/ds-custom_endpoints/v1/me',
         formData,
@@ -120,13 +120,9 @@ const Profile = () => {
         }
       );
 
-      // console.log(response);
-
       if (response.status === 200) {
         Alert.alert('Success', 'Profile picture updated successfully');
-
         setProfileImage(response.data.ds_profile_pic);
-        // Update local profile image state
       } else {
         Alert.alert('Error', 'Failed to update profile picture');
       }
@@ -135,10 +131,8 @@ const Profile = () => {
       Alert.alert('Error', 'An error occurred while updating the profile picture');
     }
   };
+
   const handleUpdate = async () => {
-    console.log('====================================');
-    console.log(form);
-    console.log('====================================');
     const queryParams = new URLSearchParams({
       first_name: form.first_name,
       last_name: form.last_name,
@@ -151,7 +145,6 @@ const Profile = () => {
     }).toString();
 
     try {
-      // Make the API call with query parameters
       const response = await axios.post(
         `https://www.sarvail.net/wp-json/ds-custom_endpoints/v1/me?${queryParams}`,
         {},
@@ -164,46 +157,43 @@ const Profile = () => {
 
       if (response.status === 200) {
         Alert.alert('Success', 'Profile updated successfully');
-        console.log('====================================');
-        console.log("updatedUser", response);
-        console.log('====================================');
-        // Update local user state with new data
         const updatedUser = {
-          ...user,  // Spread the existing user data
-          first_name: response.data.user_meta.first_name,
-          last_name: response.data.last_name,
-          ds_batch: response.data.user.ds_batch,
-          ds_res_mobile: response.data.ds_res_mobile || user.ds_res_mobile, // Update specific fields
-          country_code: response.data.country_code || user.country_code,
-          ds_profession: response.data.ds_profession || user.ds_profession,
-          ds_profile_pic: response.data.user?.ds_profile_pic
+          ...user,
+          user: {
+            ...user.user,
+            ds_batch: response.data.user.ds_batch,
+            ds_profile_pic: response.data.user.ds_profile_pic
+          },
+          user_meta: {
+            ...user.user_meta,
+            first_name: response.data.user_meta.first_name,
+            last_name: response.data.user_meta.last_name,
+            ds_res_mobile: response.data.user_meta.ds_res_mobile,
+            country_code: response.data.user_meta.country_code,
+            ds_profession: response.data.user_meta.ds_profession
+          }
         };
-        setUser(updatedUser); // Set the updated user data in state
+        setUser(updatedUser);
         setForm({
-          ...user,  // Spread the existing user data
+          ...form,
           first_name: response.data.user_meta.first_name,
-          last_name: response.data.last_name,
+          last_name: response.data.user_meta.last_name,
           ds_batch: response.data.user.ds_batch,
-          ds_res_mobile: response.data.ds_res_mobile || user.ds_res_mobile, // Update specific fields
-          country_code: response.data.country_code || user.country_code,
-          ds_profession: response.data.ds_profession || user.ds_profession,
-          ds_profile_pic: response.data.user?.ds_profile_pic
+          ds_res_mobile: response.data.user_meta.ds_res_mobile,
+          country_code: response.data.user_meta.country_code,
+          ds_profession: response.data.user_meta.ds_profession,
+          ds_profile_pic: response.data.user.ds_profile_pic
         });
 
-        await SimpleStore.update('user', updatedUser); // Update the stored user data
-
+        await SimpleStore.update('user', updatedUser);
       } else {
         Alert.alert('Error', 'Failed to update profile');
       }
-
-      // console.log(response.data);
-      return response.data;
     } catch (error) {
       console.error('Error updating profile', error);
       Alert.alert('Error', 'An error occurred while updating the profile');
     }
   };
-
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -224,14 +214,12 @@ const Profile = () => {
     <SafeAreaView className='bg-primary flex-1'>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20, alignItems: 'center' }}
-        refreshControl={ // Add refresh control
+        refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         <View>
-          <TouchableOpacity
-            onPress={openPicker}
-          >
+          <TouchableOpacity onPress={openPicker}>
             <Image
               source={{ uri: profileImage || defaultImage }}
               style={{ width: 80, height: 80 }}
@@ -263,6 +251,7 @@ const Profile = () => {
           value={form.user_email}
           handleChangeText={(e) => setForm({ ...form, user_email: e })}
           otherStyles="mt-7"
+          isEditable={false}
           keyboardType='email-address'
           placeholder="Enter Email.."
         />
@@ -295,6 +284,6 @@ const Profile = () => {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 export default Profile;
