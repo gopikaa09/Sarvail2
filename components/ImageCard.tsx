@@ -50,7 +50,7 @@ const ImageCard = ({ item }) => {
   };
 
   return (
-    <View className="flex flex-col px-4 mb-8">
+    <View className="flex flex-col px-4 mb-4">
       <View className="flex flex-row gap-3 items-start">
         <View className="flex justify-center items-center flex-row flex-1">
           {/* Avatar or additional content */}

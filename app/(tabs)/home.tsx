@@ -5,9 +5,9 @@ import ImageCard from '@/components/ImageCard';
 import Badge from '@/components/Badge';
 import Carousel from 'react-native-reanimated-carousel';
 import { LinearGradient } from 'expo-linear-gradient';
-import { icons } from '@/constants';
 import { useRouter } from 'expo-router';
 import SearchInput from '@/components/SearchInput';
+import { debounce } from 'lodash';
 
 const { width } = Dimensions.get('window');
 
@@ -19,11 +19,13 @@ const Home = () => {
   const [query, setQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [carouselData, setCarouselData] = useState([]);
-  const [refreshing, setRefreshing] = useState(false); // State for managing refreshing
-  const [searchVisible, setSearchVisible] = useState(false); // State for managing search visibility
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchVisible, setSearchVisible] = useState(false); // Start with false
+  const [searchFocused, setSearchFocused] = useState(false);
 
   const router = useRouter();
-  const scrollY = useRef(new Animated.Value(0)).current; // Reference for scroll position
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const prevScrollY = useRef(0);
 
   useEffect(() => {
     fetchData(selectedFilters);
@@ -66,7 +68,6 @@ const Home = () => {
     } else {
       setFilteredData(data);
     }
-    Keyboard.dismiss();
   };
 
   const TopFilters = [
@@ -115,53 +116,63 @@ const Home = () => {
   ), [router]);
 
   const headerComponent = () => (
-    <View className="my-6">
-      <View className='flex flex-row justify-between mx-2'>
+    <View className="mt-6">
+      <View className='flex flex-row justify-between m-2'>
         <View className='flex flex-row items-end'>
-          <Text className='text-secondary-100 text-4xl'>S</Text><Text className="font-semibold text-3xl text-gray-100">arvail</Text>
+          <Text className='text-secondary-100 text-4xl'>S</Text>
+          <Text className="font-semibold text-3xl text-gray-100">arvail</Text>
         </View>
       </View>
 
-      <View className=''>
-        {searchVisible && (
-          <View className='px-2'>
-            <SearchInput
-              placeholder="Search..."
-              query={query}
-              setQuery={setQuery}
-              onSearch={handleSearch}
-            />
+      <View className='px-2'>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="flex-row">
+            {TopFilters.map((filter, index) => (
+              <Badge
+                key={index}
+                text={filter.label}
+                isSelected={selectedFilters.includes(filter.value)}
+                onPress={() => handleFilters(filter.value)}
+              />
+            ))}
           </View>
-        )}
-        <View className='px-2'>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row my-1.5">
-              {TopFilters.map((filter, index) => (
-                <Badge
-                  key={index}
-                  text={filter.label}
-                  isSelected={selectedFilters.includes(filter.value)}
-                  onPress={() => handleFilters(filter.value)}
-                />
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-        <ScrollView>
-          <Carousel
-            data={carouselData}
-            width={width}
-            height={280}
-            scrollAnimationDuration={300}
-            snapEnabled={true}
-            mode='parallax'
-            autoPlay={true}
-            autoPlayInterval={2000}
-            showPagination={true}
-            renderItem={renderItem}
-          />
         </ScrollView>
       </View>
+
+      <Animated.View
+        style={[
+          styles.searchContainer,
+          {
+            opacity: searchVisible || searchFocused ? 1 : 0,
+            height: searchVisible || searchFocused ? 60 : 0,
+            transform: [{ translateY: searchVisible || searchFocused ? 0 : -60 }],
+          }
+        ]}
+      >
+        <SearchInput
+          placeholder="Search..."
+          query={query}
+          setQuery={setQuery}
+          onSearch={handleSearch}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
+        />
+      </Animated.View>
+
+      <ScrollView className='-my-2'>
+        <Carousel
+          data={carouselData}
+          width={width}
+          height={280}
+          scrollAnimationDuration={400}
+          snapEnabled={true}
+          mode='parallax'
+          autoPlay={true}
+          autoPlayInterval={2000}
+          showPagination={true}
+          renderItem={renderItem}
+        />
+      </ScrollView>
     </View>
   );
 
@@ -169,19 +180,45 @@ const Home = () => {
     fetchData(selectedFilters);
   }, [selectedFilters]);
 
-  // Track scroll direction
+  const debouncedHandleScroll = debounce((event) => {
+    const currentOffset = event.nativeEvent.contentOffset.y;
+
+    if (currentOffset > prevScrollY.current) {
+      if (!searchFocused) {
+        setSearchVisible(false);
+      }
+    } else {
+      setSearchVisible(true);
+    }
+
+    prevScrollY.current = currentOffset;
+  }, 100);
+
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {
       useNativeDriver: false,
       listener: (event) => {
-        const currentOffset = event.nativeEvent.contentOffset.y;
-        if (currentOffset > scrollY) {
-          setSearchVisible(false); // Scroll down
-        } else {
-          setSearchVisible(true); // Scroll up
+        // Ensure event and event.nativeEvent are not null
+        if (event && event.nativeEvent) {
+          const currentOffset = event.nativeEvent.contentOffset.y;
+
+          // Ensure prevScrollY.current is defined
+          if (prevScrollY.current !== undefined) {
+            if (currentOffset > prevScrollY.current) {
+              // Scrolling down
+              if (!searchFocused) {
+                setSearchVisible(false);
+              }
+            } else {
+              // Scrolling up
+              setSearchVisible(true);
+            }
+
+            // Update previous scroll position
+            prevScrollY.current = currentOffset;
+          }
         }
-        scrollY.setValue(currentOffset);
       },
     }
   );
@@ -211,7 +248,7 @@ const Home = () => {
           keyboardDismissMode="on-drag"
           refreshing={refreshing}
           onRefresh={onRefresh}
-          onScroll={handleScroll} // Attach scroll handler
+          onScroll={handleScroll}
         />
       )}
     </SafeAreaView>
@@ -254,4 +291,13 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 5,
   },
+  searchContainer: {
+    backgroundColor: '#161622',
+    zIndex: 1,
+    elevation: 2,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    overflow: 'hidden',
+  },
 });
+
