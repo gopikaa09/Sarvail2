@@ -1,7 +1,7 @@
 import CustomButton from '@/components/CustomButton';
 import FormField from '@/components/FormField';
 import axios from 'axios';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -92,6 +92,7 @@ export default function ConfirmOTP() {
               isLoading={isSubmitting}
               containerStyles="mt-7"
             />
+
           ) : (
             <>
               <FormField
@@ -115,7 +116,12 @@ export default function ConfirmOTP() {
               />
             </>
           )}
+          <View className='justify-center pt-5 flex-row gap-1'>
+            <Text className='text-lg text-gray-100 font-pregular'>Don't have an account?</Text>
+            <Link href="/sign-up" className='text-lg text-secondary font-pregular'>Sign Up</Link>
+          </View>
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );

@@ -33,7 +33,6 @@ const SignUp = () => {
   const submit = async () => {
     console.log(form);
     setisSubmitting(true);
-
     try {
       const response = await axios.post(
         `https://sarvail.net/wp-json/ds-custom_endpoints/v1/register`,
@@ -55,7 +54,7 @@ const SignUp = () => {
       }
       if (response.status === 200) {
         Alert.alert("Success", "User registered successfully");
-        router.replace("/confirmOTP");
+        router.replace("/otpRegisterConfirm");
       }
     } catch (error) {
       Alert.alert("Error", error.message);

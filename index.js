@@ -1,8 +1,15 @@
-import { registerRootComponent } from 'expo';
+import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AsyncStorage as WebStorage } from "@react-native-async-storage/async-storage-web";
 
-import App from './App';
+// Set up AsyncStorage for the web
+if (Platform.OS === "web") {
+  AsyncStorage = WebStorage;
+}
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+// Your app rendering logic here
+import { AppRegistry } from "react-native";
+import App from "./App";
+import { name as appName } from "./app.json";
+
+AppRegistry.registerComponent(appName, () => App);

@@ -214,72 +214,35 @@ const Profile = () => {
     <SafeAreaView className='bg-primary flex-1'>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20, alignItems: 'center' }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        <View>
-          <TouchableOpacity onPress={openPicker}>
-            <Image
-              source={{ uri: profileImage || defaultImage }}
-              style={{ width: 80, height: 80 }}
-              className="rounded-full mt-5"
-              resizeMode="cover"
-            />
-            <View className='absolute left-14 top-20 bg-black-100 rounded-2xl'>
-              <Icons name="pencil" size={20} color="white" />
-            </View>
-          </TouchableOpacity>
-        </View>
-        <Text className='text-white font-semibold text-lg my-2'>{form.first_name} {form.last_name}</Text>
-        <FormField
-          title="First Name"
-          value={form.first_name}
-          handleChangeText={(e) => setForm({ ...form, first_name: e })}
-          otherStyles="mt-7"
-          placeholder="First Name"
-        />
-        <FormField
-          title="Last Name"
-          value={form.last_name}
-          handleChangeText={(e) => setForm({ ...form, last_name: e })}
-          otherStyles="mt-7"
-          placeholder="Last Name"
-        />
-        <FormField
-          title="Email"
-          value={form.user_email}
-          handleChangeText={(e) => setForm({ ...form, user_email: e })}
-          otherStyles="mt-7"
-          isEditable={false}
-          keyboardType='email-address'
-          placeholder="Enter Email.."
-        />
-        <FormField
-          title="Batch"
-          value={form.ds_batch}
-          handleChangeText={(e) => setForm({ ...form, ds_batch: e })}
-          otherStyles="mt-7"
-          placeholder="Enter Batch.."
-        />
-        <FormField
-          title="Profession"
-          value={form.ds_profession}
-          handleChangeText={(e) => setForm({ ...form, ds_profession: e })}
-          otherStyles="mt-7"
-          placeholder="Enter your Profession.."
-        />
-        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', width: '100%' }} className='mb-4'>
-          <CustomButton
-            title="Update"
-            handlePress={handleUpdate} // Add the update handler
-            containerStyles="mt-7 px-5 min-h-[50px]"
+        <View className='w-full flex-1'>
+          <View className='flex-row justify-between items-center'>
+            <TouchableOpacity onPress={handleLogout}>
+              <Icons name="close" size={30} color="white" />
+            </TouchableOpacity>
+          </View>
+          <View className='mt-8'>
+            <TouchableOpacity onPress={openPicker} className='relative'>
+              <Image
+                source={profileImage ? { uri: profileImage } : { uri: defaultImage }}
+                style={{ width: 100, height: 100, borderRadius: 50 }}
+              />
+            </TouchableOpacity>
+            <Text className='text-white text-center mt-2'>{form.username}</Text>
+          </View>
+          <FormField
+            label="First Name"
+            value={form.first_name}
+            onChangeText={(text) => setForm({ ...form, first_name: text })}
           />
-          <CustomButton
-            title="Log Out"
-            handlePress={handleLogout}
-            containerStyles="bg-white mt-7 px-5 py-2 min-h-[50px]"
+          <FormField
+            label="Last Name"
+            value={form.last_name}
+            onChangeText={(text) => setForm({ ...form, last_name: text })}
           />
+          {/* Add other form fields here */}
+          <CustomButton onPress={handleUpdate}>Update</CustomButton>
         </View>
       </ScrollView>
     </SafeAreaView>
